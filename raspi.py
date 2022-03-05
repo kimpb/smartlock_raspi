@@ -65,27 +65,27 @@ while True:
 
 # 클라이언트 접속 대기
     btconnected_socket, client_address = btserver_socket.accept()
-
+    btrecvKEY = None
+    print(btrecvKEY)
     print("bluetooth connected")
 
     try:
-        while btrecvKEY is not None:
+        while True:
             btrecvKEY = btconnected_socket.recv(1024)
             btrecvKEY = btrecvKEY.decode('utf-8')
             print("bluetooth client : ", btrecvKEY)
 
             time.sleep(0.1)
 
-
-
+            if btrecvKEY is not None:
+                break
 
             btconnected_socket.send(btrecvKEY)
 
     except:
         pass
 
-
-
+    print(btrecvKEY)
     print("bluetooth socket closed")
 
     btconnected_socket.close()
@@ -98,7 +98,7 @@ while True:
     print("server connected")
     svclient_socket.send('raspi'.encode())
 
-    time.sleep(0.1)
+    time.sleep(0.2)
 
 
     svclient_socket.close()
@@ -114,5 +114,10 @@ while True:
 
         time.sleep(5)
         GPIO.output(2, False)
+        print("locked")
+        btrecvKEY = None
+
     else:
         print("locked")
+        btrecvKEY = None
+
