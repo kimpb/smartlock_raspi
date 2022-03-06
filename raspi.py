@@ -11,7 +11,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(2, GPIO.OUT)
 GPIO.output(2, False)
 
-svHOST = '3.37.62.251'
+svHOST = '13.209.98.41'
 svPORT = 4000
 btHOST = ""  # '블루투스 컨트롤러 맥 주소'를 직접 입력해도 됨
 btPORT = bluetooth.PORT_ANY
