@@ -24,6 +24,11 @@ def svrecv_data(svclient_socket):
         svrecvKEY = svclient_socket.recv(1024)
         svrecvKEY = svrecvKEY.decode()
         print("server OTP : ",svrecvKEY)
+        global stop_threads
+        stop_threads = True
+        if stop_threads:
+            svclient_socket.close()
+            break
 
 def btrecv_data(btclient_socket):
     while True:
@@ -45,6 +50,8 @@ def signal_handler(sig, frame):
 
 while True:
     signal.signal(signal.SIGINT, signal_handler)
+
+    stop_threads = False
 
 # 블루투스 서버 소켓 생성
     btserver_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -98,7 +105,9 @@ while True:
     print("server connected")
     svclient_socket.send('raspi'.encode())
 
-    time.sleep(0.2)
+    time.sleep(0.4)
+
+    stop_threads = False
 
 
     svclient_socket.close()
