@@ -5,6 +5,10 @@ import RPi.GPIO as GPIO
 import time
 import socket
 from _thread import *
+from encodings import utf_8
+import base64
+from Crypto import Random
+from Crypto.Cipher import AES
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -17,13 +21,26 @@ btHOST = ""  # '블루투스 컨트롤러 맥 주소'를 직접 입력해도 됨
 btPORT = bluetooth.PORT_ANY
 UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 
+global iv
+iv = '0123456789012345' # 16bit
+
+BS = AES.block_size
+pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+unpad = lambda s : s[0:-ord(s[-1])]
+global otp_key
+otp_key = 'QWERQWERQWERQWERQWERQWERQWERQWER'
+key = otp_key.encode('utf-8')
 
 def svrecv_data(svclient_socket):
     while True:
-        global svrecvKEY
+        global decryptotp
         svrecvKEY = svclient_socket.recv(1024)
         svrecvKEY = svrecvKEY.decode()
         print("server OTP : ",svrecvKEY)
+        cipher = AES.new(otp_key.encode("utf8"), AES.MODE_CBC, IV=iv.encdoe("utf8"))
+        decryptotp = cipher.decrypt(base64.b64decode(svrecvKEY))
+        decryptotp = unpad(decryptotp.decode("utf8"))
+        print(decryptotp)
         global stop_threads
         stop_threads = True
         if stop_threads:
@@ -116,7 +133,7 @@ while True:
 
 
 
-    if btrecvKEY == svrecvKEY:
+    if btrecvKEY == decryptotp:
         GPIO.output(2, True)
 
         print("unlocked")
